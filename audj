@@ -1,0 +1,207 @@
+--// visualizer \\--
+
+
+getgenv().prefix = "-"
+getgenv().vis = false
+getgenv().rots = 20
+getgenv().initialRotationOffset = math.rad(90)
+getgenv().flipHorizontally = false
+getgenv().flipVertically = true
+getgenv().distance = 5
+getgenv().maxDistance = 480
+getgenv().amount = 10
+getgenv().x = 5.1
+getgenv().y = 2.00000000012341234123462
+getgenv().z = 1
+getgenv().partvis = false
+
+
+local function Chat(message)
+game.Players:Chat(message)
+end
+
+
+
+game.Players.LocalPlayer.Chatted:Connect(function(msg)
+	local msgsplit = msg:split(" ")
+	local cmd = msgsplit[1]
+	if cmd == prefix.."vis" then
+	    getgenv().partvis = true
+		local autovis = true
+		local LocalPlayer = game:GetService("Players").LocalPlayer
+		local unanchoredparts = {}
+		local movers = {}
+		local Players = game:GetService("Players")
+		for i = 1, amount do
+			game.Players:Chat("part/"..x.."/"..y.."/"..z)
+			task.wait(0.02)
+		end
+		task.wait(.2)
+		local ignore = {}
+		for index, part in pairs(workspace.Terrain._Game.Folder:GetDescendants()) do
+			if part:IsA("Part") and part.Anchored == false and part:IsDescendantOf(LocalPlayer.Character) == false and part:IsDescendantOf(game.Players) == false then
+				if part.Size == Vector3.new(x, y, z) then
+					table.insert(unanchoredparts, part)
+					part.Massless = true
+					part.CanCollide = false
+					part.Velocity = Vector3.new(34, 54, 0)
+					part.Anchored = false
+					if part:FindFirstChildOfClass("BodyPosition") ~= nil then
+						part:FindFirstChildOfClass("BodyPosition"):Destroy()
+					end
+				end
+			end
+		end
+
+		local center = Instance.new("Part")
+		center.Size = Vector3.new(1, 1, 1)
+		center.Name = "shittyfart"
+		center.Anchored = true
+		center.Transparency = 1
+		center.CanCollide = false
+		center.Parent = workspace
+		getgenv().vis = true
+		for i,v in next, game:GetService("Players").LocalPlayer.Character:GetDescendants() do
+			if v:IsA("BasePart") and v.Name ~="HumanoidRootPart" then 
+				l=game:GetService("RunService").Heartbeat:connect(function()
+					if vis == false then l:disconnect() end
+					v.Velocity = Vector3.new(34, 54, 0)
+				end)
+			end
+		end
+		a=game:GetService("RunService").Heartbeat:connect(function()
+			setsimulationradius(999.999,999.999)
+			local LocalPlayer = game:GetService("Players").LocalPlayer
+			LocalPlayer.MaximumSimulationRadius = math.huge
+			sethiddenproperty(LocalPlayer, "SimulationRadius", 999.999) --//Constantly set simulation to contain parts
+			if vis == false then
+				for _, mover in pairs(movers) do 
+					unanchoredparts = {}
+					a:disconnect()
+				end
+			end
+			if vis == true then
+				for i, part in ipairs(unanchoredparts) do
+					part.Velocity = Vector3.new(34, 54, 0)
+					local Folder243 = workspace.Terrain._Game.Folder
+					for i, v in pairs(Folder243:GetDescendants()) do 
+						if v:IsA("Sound") and v.PlaybackLoudness then
+							distance = 8 + v.PlaybackLoudness / 100
+						end
+					end
+					distance = math.min(distance, maxDistance)
+					local character = game.Players.LocalPlayer.Character
+					local rootPart = character.HumanoidRootPart
+
+					center.Position = rootPart.Position
+					local angle = math.rad((i - 1) * 36)
+					local rotationAngle = math.rad(rots * os.clock())
+					local offsetX = distance * math.cos(angle + rotationAngle + initialRotationOffset)
+					local offsetY = 0 * math.sin(0 * angle + rotationAngle)
+					local offsetZ = distance * math.sin(angle + rotationAngle + initialRotationOffset)
+					local rotatedPosition = rootPart.Position + Vector3.new(offsetX, offsetY, offsetZ)
+					local lookVector = (rootPart.Position - rotatedPosition).Unit
+					local upVector = Vector3.new(0, 1, 0)
+					local rotation = CFrame.lookAt(Vector3.new(), lookVector, upVector)
+					part.CFrame = CFrame.new(rotatedPosition) * rotation
+				end	
+			end	
+		end)
+	end
+end)
+
+game.Players.LocalPlayer.Chatted:Connect(function(msg)
+	local msgsplit = msg:split(" ")
+	local cmd = msgsplit[1]
+	if cmd == prefix.."novis" then
+		getgenv().partvis = false
+		local autovis = false
+		chat("clr")
+		getgenv().vis = false
+	end
+end)
+game.Players.LocalPlayer.Chatted:Connect(function(msg)
+	local msgsplit = msg:split(" ")
+	local cmd = msgsplit[1]
+	if cmd == prefix.."revis" then
+		chat("clr")
+	end
+end)
+game.Players.LocalPlayer.Chatted:Connect(function(msg)
+	local msgsplit = msg:split(" ")
+	local cmd = msgsplit[1]
+	local a = msgsplit[2]
+	local b = msgsplit[3]
+	local c = msgsplit[4]
+	if cmd == prefix.."vsize" then
+		getgenv().x = a
+		getgenv().y = b + 0.00000000012341234123462
+		getgenv().z = c
+	end
+end)
+game.Players.LocalPlayer.Chatted:Connect(function(msg)
+	local msgsplit = msg:split(" ")
+	local cmd = msgsplit[1]
+	local speed = msgsplit[2]
+	if cmd == prefix.."vspeed" then
+		getgenv().rots = speed
+	end
+end)
+
+
+game.Players.LocalPlayer.Chatted:Connect(function(msg)
+    local msgsplit = msg:split(" ")
+    local cmd = msgsplit[1]
+
+game:GetService("RunService").Heartbeat:Connect(function()
+    if getgenv().orbitingPlayer and getgenv().orbitTarget then
+        local character = game.Players.LocalPlayer.Character
+        local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+        if rootPart then
+            local direction = (getgenv().orbitTarget.Position - rootPart.Position).unit
+            local right = rootPart.CFrame.RightVector
+
+            local angle = math.atan2(direction.Z, direction.X)
+            local orbitAngle = angle + math.rad(getgenv().orbitSpeed * tick())
+            
+            local newOffset = Vector3.new(math.cos(orbitAngle), 0, math.sin(orbitAngle)) * getgenv().distance
+            local newPosition = getgenv().orbitTarget.Position + newOffset
+            rootPart.CFrame = CFrame.new(newPosition, getgenv().orbitTarget.Position) * CFrame.Angles(0, math.rad(getgenv().rots * tick()), 0)
+        end
+    end
+end)
+
+game.Players.LocalPlayer.Chatted:Connect(function(msg)
+	local msgsplit = msg:split(" ")
+	local cmd = msgsplit[1]
+	local part = msgsplit[2]
+	if cmd == prefix.."vparts" then
+		chat("clr")
+		getgenv().amount = part
+	end
+end)
+
+for _, v in pairs(game.Players:GetChildren()) do 
+	v.Chatted:Connect(function(msg)
+		if msg == "clr" or msg == "clean" or msg == ":clr" or msg == "clear" or msg == ":clear" or msg == ":clean" then
+			if partvis then
+			wait()
+			chat(prefix.."vis")
+			end
+		end
+	end)
+end
+
+game.Players.PlayerAdded:Connect(function(p)
+	p.Chatted:Connect(function(msg)
+		if msg == "clr" or msg == "clean" or msg == ":clr" or msg == "clear" or msg == ":clear" or msg == ":clean" then
+			if partvis then
+			wait()
+			chat(prefix.."vis")
+			end
+		end
+	end)
+end)
+		end)
+
+
