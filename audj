@@ -86,7 +86,7 @@ game.Players.LocalPlayer.Chatted:Connect(function(msg)
 					local Folder243 = workspace.Terrain._Game.Folder
 					for i, v in pairs(Folder243:GetDescendants()) do 
 						if v:IsA("Sound") and v.PlaybackLoudness then
-							distance = 8 + v.PlaybackLoudness / 50
+							distance = 8 + v.PlaybackLoudness / 30
 						end
 					end
 					distance = math.min(distance, maxDistance)
